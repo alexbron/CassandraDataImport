@@ -71,8 +71,8 @@ public class JmxBulkLoader {
 //        }
 
 
-        JmxBulkLoader np = new JmxBulkLoader("172.16.3.121", 7199);
-        np.bulkLoad("/root/Alex/lightspeed/analytics_dev_active_users_daily/");
+        JmxBulkLoader np = new JmxBulkLoader("172.19.2.251", 7199);
+        np.bulkLoad("/tmp/Alex/lightspeed/analytics_dev_active_users_hourly");
 //        for (String arg : args) {
 //            np.bulkLoad(arg);
 //        }

@@ -37,7 +37,7 @@ public class ScpTo {
 //        session.setPassword("Q1w2e3r$");
         jsch.addIdentity("/home/ubuntu/projects/CassandraDataImport2/touchbean-virginia.pem");
 
-        session = jsch.getSession("ec2-user","172.19.2.125",22);
+        session = jsch.getSession("ec2-user","172.19.2.251",22);
         session.setConfig("StrictHostKeyChecking", "no");
     }
 
