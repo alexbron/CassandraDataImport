@@ -15,11 +15,12 @@ public class ScpTo {
     private final File localFolder;
     private final String remoteFolder;
     private Session session;
+    private ChannelSftp channel=null;
 
-//    public static void main(String[] args)  {
+    //    public static void main(String[] args)  {
 //        try {
 //            ScpTo scpTo = new ScpTo(new File ("/home/ubuntu/projects/Analytics/lightspeed"), remoteFolder);
-//            scpTo.copy();
+//            scpTo.move();
 //
 //        } catch (JSchException e) {
 //            e.printStackTrace();
@@ -41,18 +42,34 @@ public class ScpTo {
         session.setConfig("StrictHostKeyChecking", "no");
     }
 
-    public  void copy() throws JSchException, SftpException, FileNotFoundException {
+    public  void move() throws JSchException, SftpException, FileNotFoundException {
+        initChannel();
+
+        for (final File fileEntry : localFolder.listFiles()) {
+            channel.put(new FileInputStream(fileEntry), fileEntry.getName());
+            fileEntry.delete();
+
+        }
+    }
+
+    public void rmRemoteFiles() throws SftpException, JSchException {
+        initChannel();
+        channel.rm("*");
+    }
+
+
+    public void disconnect() {
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    public void initChannel() throws JSchException, SftpException {
+        if(channel!=null)
+            return ;
         session.connect();
-        ChannelSftp channel = null;
         channel = (ChannelSftp)session.openChannel("sftp");
         channel.connect();
         channel.cd(remoteFolder);
-
-        for (final File fileEntry : localFolder.listFiles()) {
-            channel.put(new FileInputStream(fileEntry),fileEntry.getName());
-        }
-        channel.disconnect();
-        session.disconnect();
     }
 
 }

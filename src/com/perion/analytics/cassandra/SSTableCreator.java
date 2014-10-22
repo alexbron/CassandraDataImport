@@ -46,7 +46,6 @@ public class SSTableCreator {
         //repeat with all other desired appenders
     }
     public File createSSTableFiles(String csvFile, String keyspace, String columnFamily) throws IOException {
-        System.out.print("hello");
         initLog();
         System.setProperty("cassandra.config","file:///home/ubuntu/projects/CassandraDataImport2/cassandra.yaml");
         System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
