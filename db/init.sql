@@ -16,3 +16,10 @@ m5 text,
 m6 text	,
 PRIMARY KEY (partner_filter_gb1_gb2, dt_gb1_gb2)
 ) with compaction = { 'class' : 'LeveledCompactionStrategy' };
+
+create table lightspeed. analytics_dev_maxtimestamps
+(
+	report  text,
+	maxtimestamp text,
+	PRIMARY KEY (report)
+);
