@@ -17,20 +17,6 @@ public class ScpTo {
     private Session session;
     private ChannelSftp channel=null;
 
-    //    public static void main(String[] args)  {
-//        try {
-//            ScpTo scpTo = new ScpTo(new File ("/home/ubuntu/projects/Analytics/lightspeed"), remoteFolder);
-//            scpTo.move();
-//
-//        } catch (JSchException e) {
-//            e.printStackTrace();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (SftpException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
     public ScpTo(File localFolder, String remoteFolder, String host, String username, String prvkey) throws JSchException, FileNotFoundException, SftpException {
         JSch jsch = new JSch();
         this.localFolder = localFolder;
@@ -46,15 +32,41 @@ public class ScpTo {
         initChannel();
 
         for (final File fileEntry : localFolder.listFiles()) {
-            channel.put(new FileInputStream(fileEntry), fileEntry.getName());
+            final String remoteFilePath = remoteFolder + "/" + fileEntry.getName();
+            try {
+                channel.put(new FileInputStream(fileEntry), remoteFilePath);
+            }
+            catch (SftpException e) {
+                mkTargetFolder();
+                channel.put(new FileInputStream(fileEntry), remoteFilePath);
+            }
             fileEntry.delete();
 
         }
     }
 
+    private void mkTargetFolder() throws SftpException {
+        System.out.println("Creating Directory...");
+        String[] complPath = remoteFolder.split("/");
+        channel.cd("/");
+        for (String dir : complPath) {
+            if (dir.length() > 0) {
+                try {
+                    System.out.println("Current Dir : " + channel.pwd());
+                    channel.cd(dir);
+                } catch (SftpException e2) {
+                    channel.mkdir(dir);
+                    channel.cd(dir);
+                }
+            }
+        }
+        channel.cd("/");
+        System.out.println("Current Dir : " + channel.pwd());
+    }
+
     public void rmRemoteFiles() throws SftpException, JSchException {
         initChannel();
-        channel.rm("*");
+        channel.rm(remoteFolder + "/" + "*");
     }
 
 
