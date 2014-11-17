@@ -33,7 +33,6 @@ public class DataImport2Cassandra {
     }
 
     public File createSSTableFiles(String keyspace, String csvFile) throws IOException {
-//        System.setProperty("cassandra.config","///home/ubuntu/projects/CassandraDataImport2/cassandra1.yaml");
         BufferedReader reader = new BufferedReader(new FileReader(csvFile));
         File directory = new File(keyspace);
         if (!directory.exists()) {

@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 /**
  * Created by ubuntu on 10/15/14.
  */
-public class ScpTo {
+public class ScpTo implements CopyTo {
 
     private final File localFolder;
     private final String remoteFolder;
@@ -28,6 +28,7 @@ public class ScpTo {
         session.setConfig("StrictHostKeyChecking", "no");
     }
 
+    @Override
     public  void move() throws JSchException, SftpException, FileNotFoundException {
         initChannel();
 
@@ -64,12 +65,14 @@ public class ScpTo {
         System.out.println("Current Dir : " + channel.pwd());
     }
 
+    @Override
     public void rmRemoteFiles() throws SftpException, JSchException {
         initChannel();
         channel.rm(remoteFolder + "/" + "*");
     }
 
 
+    @Override
     public void disconnect() {
         channel.disconnect();
         session.disconnect();
@@ -81,7 +84,7 @@ public class ScpTo {
         session.connect();
         channel = (ChannelSftp)session.openChannel("sftp");
         channel.connect();
-        channel.cd(remoteFolder);
+//        channel.cd(remoteFolder);
     }
 
 }

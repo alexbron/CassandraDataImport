@@ -47,8 +47,12 @@ public class SSTableCreator {
     }
     public File createSSTableFiles(String csvFile, String keyspace, String columnFamily) throws IOException {
         initLog();
-        System.setProperty("cassandra.config","file:///home/ubuntu/projects/CassandraDataImport2/cassandra.yaml");
-        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
+//        System.out.print(System.getProperty("cassandra.config"));
+//        System.out.print(System.getProperty("dse.config"));
+//        System.exit(0);
+//        System.setProperty("cassandra.config","file:///home/ubuntu/projects/CassandraDataImport2/cassandra.yaml");
+
+//        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
         BufferedReader reader = new BufferedReader(new FileReader(csvFile));
         File directory = new File(keyspace);
         if (!directory.exists()) {
