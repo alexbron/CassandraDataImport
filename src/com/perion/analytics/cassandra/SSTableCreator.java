@@ -137,12 +137,12 @@ public class SSTableCreator {
                 dim_gb1 = columns[2].trim();
                 dim_gb2 = columns[3].trim();
                 f = columns[4].trim();
-                m1 = columns[5].trim();
-                m2 = columns[6].trim();
-                m3 = columns[7].trim();
-                m4 = columns[8].trim();
-                m5 = columns[9].trim();
-                m6 = columns[10].trim();
+                m1 = columns.length<=5 ? "0": columns[5].trim();
+                m2 = columns.length<=6 ? "0": columns[6].trim();
+                m3 = columns.length<=7 ? "0": columns[7].trim();
+                m4 = columns.length<=8 ? "0": columns[8].trim();
+                m5 = columns.length<=9 ? "0": columns[9].trim();
+                m6 = columns.length<=10 ? "0": columns[10].trim();
 //                m7 = columns[11].trim();
 //                m8 = columns[12].trim();
 //                m9 = columns[13].trim();

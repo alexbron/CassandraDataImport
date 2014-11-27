@@ -13,13 +13,13 @@ public class Import2Cassandra {
 
     public static void main(String[] args) throws Exception {
         final String keyspace = "lightspeed";
-        final String columnFamily = "analytics_dev_funnel_daily";
-        final String csvFile = "/tmp/s3_file_funnel_daily.csv";
+        final String columnFamily = "analytics_dev_usage_daily";
+        final String csvFile = "/tmp/s3_file_usage_daily.csv";
         final String remoteFolderRoot = "/tmp/Alex/";
-        final String remoteHost = "172.19.2.251";
+        final String remoteHost = "172.26.31.249";
         final int jmxPort = 7199;
         final String username = "ec2-user";
-        final String prvkey = "/home/ubuntu/projects/CassandraDataImport2/touchbean-virginia.pem";
+        final String prvkey = "/home/ubuntu/.ssh/newplatform-us.pem";
 
 
         new Import2Cassandra().importData(keyspace, columnFamily, csvFile, remoteHost, jmxPort, username, prvkey, remoteFolderRoot, 1);
