@@ -54,7 +54,7 @@ public class SSTableCreator {
 
 //        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
         BufferedReader reader = new BufferedReader(new FileReader(csvFile));
-        File directory = new File(keyspace);
+        File directory = new File(keyspace+columnFamily);
         if (!directory.exists()) {
             directory.mkdir();
         }

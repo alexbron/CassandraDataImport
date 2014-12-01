@@ -41,7 +41,10 @@ public class ScpTo implements CopyTo {
                 mkTargetFolder();
                 channel.put(new FileInputStream(fileEntry), remoteFilePath);
             }
-            fileEntry.delete();
+            finally {
+                fileEntry.delete();
+            }
+
 
         }
     }

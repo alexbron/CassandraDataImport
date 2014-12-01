@@ -33,10 +33,14 @@ public class Import2Cassandra {
         try {
             File sstableFolder = ssTableCreator.createSSTableFiles(csvFile, keyspace, columnFamily);
             copyTo = createCopyObject(remoteHost, username, prvkey, remoteCopy != 0 , remoteFolder, sstableFolder);
-            copyTo.move();
-            JmxBulkLoader np = new JmxBulkLoader(remoteHost, jmxPort);
-            np.bulkLoad(remoteFolder);
-            copyTo.rmRemoteFiles();
+            try{
+                copyTo.move();
+                JmxBulkLoader np = new JmxBulkLoader(remoteHost, jmxPort);
+                np.bulkLoad(remoteFolder);
+            }
+            finally {
+                copyTo.rmRemoteFiles();
+            }
 
         } catch (Exception e) {
             System.out.print(e);
