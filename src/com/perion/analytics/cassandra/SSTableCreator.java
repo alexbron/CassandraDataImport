@@ -61,24 +61,17 @@ public class SSTableCreator {
 
         // random partitioner is created, u can give the partitioner as u want
         IPartitioner partitioner = new Murmur3Partitioner();
-/*
-        new
-         */
+
         List<AbstractType<?>> types = new ArrayList<AbstractType<?>>();
         types.add(AsciiType.instance);
         types.add(AsciiType.instance);
         CompositeType cmpType = CompositeType.getInstance(types);
-        /*
-        new
 
-         */
 
 
         SSTableSimpleUnsortedWriter usersWriter = new SSTableSimpleUnsortedWriter(
                 directory, partitioner, keyspace, columnFamily, cmpType, null, 64);
-//
-//        SSTableSimpleUnsortedWriter usersWriter = new SSTableSimpleUnsortedWriter(
-//                directory, partitioner, keyspace, "analytics_dev_active_users_hourly", AsciiType.instance, null, 64);
+
 
         String line;
         int lineNumber = 1;
@@ -88,20 +81,14 @@ public class SSTableCreator {
 
         while ((line = reader.readLine()) != null) {
             if (entry.parse(line, lineNumber)) {
-
-//                ByteBuffer uuid = ByteBuffer.wrap(decompose(UUID.fromString(entry.partner_filter_gb1_gb2.replace('-',':'))));
                 usersWriter.newRow(bytes(entry.partner_filter_gb1_gb2));
-//                usersWriter.addColumn(ByteBufferUtil.bytes("partner_filter_gb1_gb2"), ByteBufferUtil.bytes(entry.partner_filter_gb1_gb2), timestamp);
-//                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes("dt_gb1_gb2")).add(ByteBufferUtil.bytes("dt_gb1_gb2")).build(), ByteBufferUtil.bytes(entry.dt_gb1_gb2), timestamp);
                 usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb1")).build(), ByteBufferUtil.bytes(entry.dim_gb1), timestamp);
                 usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb2")).build(),ByteBufferUtil.bytes(entry.dim_gb2), timestamp);
                 usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("f")).build(), ByteBufferUtil.bytes(entry.f), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m1")).build(), ByteBufferUtil.bytes(entry.m1), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m2")).build(),ByteBufferUtil.bytes(entry.m2), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m3")).build(), ByteBufferUtil.bytes(entry.m3), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m4")).build(), ByteBufferUtil.bytes(entry.m4), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m5")).build(), ByteBufferUtil.bytes(entry.m5), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m6")).build(), ByteBufferUtil.bytes(entry.m6), timestamp);
+                for(int i=1; i < CsvEntry.max_allowed_measures;i++)
+                {
+                    usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m"+i)).build(), ByteBufferUtil.bytes(entry.getMeasures()[i]), timestamp);
+                }
             }
             lineNumber++;
         }
@@ -111,7 +98,8 @@ public class SSTableCreator {
     }
 
     static class CsvEntry {
-        public String m1, m2, m3, m4, m5, m6, m7, m8, m9, m10;
+        public static int max_allowed_measures = 20;
+        public Integer[] measures = new Integer[max_allowed_measures+1];
         public String partner_filter_gb1_gb2;
         public String dt_gb1_gb2;
         public String dim_gb1;
@@ -126,33 +114,28 @@ public class SSTableCreator {
         boolean parse(String line, int lineNumber) {
             // Ghetto csv parsing
             String[] columns = line.split(",");
-//            if (columns.length != 6)
-//            {
-//                System.out.println(String.format("Invalid input '%s' at line %d of %s", line, lineNumber, filename));
-//                return false;
-//            }
+
             try {
                 partner_filter_gb1_gb2 = columns[0].trim();
                 dt_gb1_gb2 = columns[1].trim();
                 dim_gb1 = columns[2].trim();
                 dim_gb2 = columns[3].trim();
                 f = columns[4].trim();
-                m1 = columns.length<=5 ? "0": columns[5].trim();
-                m2 = columns.length<=6 ? "0": columns[6].trim();
-                m3 = columns.length<=7 ? "0": columns[7].trim();
-                m4 = columns.length<=8 ? "0": columns[8].trim();
-                m5 = columns.length<=9 ? "0": columns[9].trim();
-                m6 = columns.length<=10 ? "0": columns[10].trim();
-//                m7 = columns[11].trim();
-//                m8 = columns[12].trim();
-//                m9 = columns[13].trim();
-//                m10 = columns[14].trim();
+                for(int i=1; i < max_allowed_measures;i++)
+                {
+                    measures[i] = Integer.valueOf(columns.length <=4+i ? "0": columns[4+i].trim());
+                }
+
 
                 return true;
             } catch (NumberFormatException e) {
                 System.out.println(String.format("Invalid number in input '%s' at line %d of %s", line, lineNumber, csvFile));
                 return false;
             }
+        }
+
+        private Integer[] getMeasures() {
+            return measures;
         }
     }
 }

@@ -5,18 +5,17 @@ import com.jcraft.jsch.SftpException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-//import java.nio.file.Files;
-//import java.nio.file.StandardCopyOption;
+
 
 public class Import2Cassandra {
 
 
     public static void main(String[] args) throws Exception {
         final String keyspace = "lightspeed";
-        final String columnFamily = "analytics_dev_usage_daily";
-        final String csvFile = "/tmp/s3_file_usage_daily.csv";
+        final String columnFamily = "analytics_dev_active_users_hourly";
+        final String csvFile = "/tmp/s3_file_active_users_hourly.csv";
         final String remoteFolderRoot = "/tmp/Alex/";
-        final String remoteHost = "172.26.31.249";
+        final String remoteHost = "172.26.3.84";
         final int jmxPort = 7199;
         final String username = "ec2-user";
         final String prvkey = "/home/ubuntu/.ssh/newplatform-us.pem";
