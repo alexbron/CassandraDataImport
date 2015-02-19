@@ -7,6 +7,7 @@ import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.io.sstable.SSTableSimpleUnsortedWriter;
 import org.apache.cassandra.utils.ByteBufferUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
 
 import java.io.BufferedReader;
@@ -55,9 +56,10 @@ public class SSTableCreator {
 //        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
         BufferedReader reader = new BufferedReader(new FileReader(csvFile));
         File directory = new File(keyspace+columnFamily);
-        if (!directory.exists()) {
-            directory.mkdir();
+        if (directory.exists()) {
+            FileUtils.deleteDirectory(directory);
         }
+        directory.mkdir();
 
         // random partitioner is created, u can give the partitioner as u want
         IPartitioner partitioner = new Murmur3Partitioner();
@@ -123,7 +125,7 @@ public class SSTableCreator {
                 f = columns[4].trim();
                 for(int i=1; i < max_allowed_measures;i++)
                 {
-                    measures[i] = Integer.valueOf(columns.length <=4+i ? "0": columns[4+i].trim());
+                    measures[i] = Float.valueOf(columns.length <=4+i ? "0": columns[4+i].trim()).intValue();
                 }
 
 

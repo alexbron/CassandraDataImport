@@ -12,8 +12,8 @@ public class Import2Cassandra {
 
     public static void main(String[] args) throws Exception {
         final String keyspace = "lightspeed";
-        final String columnFamily = "analytics_dev_active_users_hourly";
-        final String csvFile = "/tmp/s3_file_active_users_hourly.csv";
+        final String columnFamily = "analytics_stg_usage_daily";
+        final String csvFile = "/tmp/s3_file_usage_daily.csv";
         final String remoteFolderRoot = "/tmp/Alex/";
         final String remoteHost = "172.26.3.84";
         final int jmxPort = 7199;
