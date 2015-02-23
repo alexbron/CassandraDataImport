@@ -31,7 +31,7 @@ public class ScpTo implements CopyTo {
     @Override
     public  void move() throws JSchException, SftpException, FileNotFoundException {
         initChannel();
-        channel.rm(remoteFolder+"/*"); // clean target folder
+        mkTargetFolder();
         for (final File fileEntry : localFolder.listFiles()) {
             final String remoteFilePath = remoteFolder + "/" + fileEntry.getName();
             try {
@@ -64,6 +64,7 @@ public class ScpTo implements CopyTo {
                 }
             }
         }
+        channel.rm(remoteFolder+"/*"); // clean target folder , if files were there before
         channel.cd("/");
         System.out.println("Current Dir : " + channel.pwd());
     }

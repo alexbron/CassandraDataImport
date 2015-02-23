@@ -8,11 +8,12 @@ import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.io.sstable.SSTableSimpleUnsortedWriter;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.mutable.MutableBoolean;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,9 @@ import static org.apache.cassandra.utils.ByteBufferUtil.bytes;
  * Created by ubuntu on 10/20/14.
  */
 public class SSTableCreator {
+
+    public static final int LINES_IN_BATCH = 100000;
+
     public void initLog()
     {
         ConsoleAppender console = new ConsoleAppender(); //create appender
@@ -46,7 +50,7 @@ public class SSTableCreator {
         Logger.getRootLogger().addAppender(fa) ;
         //repeat with all other desired appenders
     }
-    public File createSSTableFiles(String csvFile, String keyspace, String columnFamily) throws IOException {
+    public File createSSTableFiles(String csvFile, String keyspace, String columnFamily, MutableInt lineCounter, MutableBoolean lastLineRead, BufferedReader reader) throws IOException {
         initLog();
 //        System.out.print(System.getProperty("cassandra.config"));
 //        System.out.print(System.getProperty("dse.config"));
@@ -54,7 +58,6 @@ public class SSTableCreator {
 //        System.setProperty("cassandra.config","file:///home/ubuntu/projects/CassandraDataImport2/cassandra.yaml");
 
 //        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
-        BufferedReader reader = new BufferedReader(new FileReader(csvFile));
         File directory = new File(keyspace+columnFamily);
         if (directory.exists()) {
             FileUtils.deleteDirectory(directory);
@@ -76,13 +79,15 @@ public class SSTableCreator {
 
 
         String line;
-        int lineNumber = 1;
         CsvEntry entry = new CsvEntry(csvFile);
         // There is no reason not to use the same timestamp for every column in that example.
         long timestamp = System.currentTimeMillis() * 1000;
 
-        while ((line = reader.readLine()) != null) {
-            if (entry.parse(line, lineNumber)) {
+        int currentCounter = 0;
+
+        while ((line = reader.readLine()) != null && currentCounter < LINES_IN_BATCH) {
+            currentCounter++;
+            if (entry.parse(line, lineCounter.intValue()+currentCounter)) {
                 usersWriter.newRow(bytes(entry.partner_filter_gb1_gb2));
                 usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb1")).build(), ByteBufferUtil.bytes(entry.dim_gb1), timestamp);
                 usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb2")).build(),ByteBufferUtil.bytes(entry.dim_gb2), timestamp);
@@ -92,8 +97,11 @@ public class SSTableCreator {
                     usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m"+i)).build(), ByteBufferUtil.bytes(entry.getMeasures()[i]), timestamp);
                 }
             }
-            lineNumber++;
+
         }
+        lineCounter.add(currentCounter);
+        if (reader.readLine()==null)    // last line
+            lastLineRead.setValue(true);
         // Don't forget to close!
         usersWriter.close();
         return directory;
