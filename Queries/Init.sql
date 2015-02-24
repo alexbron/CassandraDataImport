@@ -106,7 +106,7 @@ create table lightspeed.analytics_stg_usage_daily
 	PRIMARY KEY (partner_filter_gb1_gb2, dt_gb1_gb2)
 ) with compaction = { 'class' : 'LeveledCompactionStrategy' };
 
-create table lightspeed.analytics_stg_external_daily
+create table lightspeed.analytics_stg_external_data_daily
 (
 	partner_filter_gb1_gb2 text,
 	dt_gb1_gb2 text,
@@ -122,7 +122,7 @@ create table lightspeed.analytics_stg_external_daily
 	PRIMARY KEY (partner_filter_gb1_gb2, dt_gb1_gb2)
 ) with compaction = { 'class' : 'LeveledCompactionStrategy' };
 
-create table lightspeed.analytics_stg_au_cohort_total_daily_daily
+create table lightspeed.analytics_stg_au_cohort_total_daily
 (
 	partner_filter_gb1_gb2 text,
 	dt_gb1_gb2 text,
