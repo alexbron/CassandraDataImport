@@ -42,7 +42,7 @@ public class SSTableCreator {
         fa.setName("FileLogger");
         fa.setFile("/tmp/mylog.log");
         fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-        fa.setThreshold(Level.DEBUG);
+        fa.setThreshold(Level.ERROR);
         fa.setAppend(true);
         fa.activateOptions();
 
