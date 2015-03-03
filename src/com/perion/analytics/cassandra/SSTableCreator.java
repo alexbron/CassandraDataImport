@@ -10,7 +10,6 @@ import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.apache.log4j.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,39 +24,11 @@ import static org.apache.cassandra.utils.ByteBufferUtil.bytes;
  */
 public class SSTableCreator {
 
-    public static final int LINES_IN_BATCH = 100000;
+    public static final int LINES_IN_BATCH = 1000000;
 
-    public void initLog()
-    {
-        ConsoleAppender console = new ConsoleAppender(); //create appender
-        //configure the appender
-        String PATTERN = "%d [%p|%c|%C{1}] %m%n";
-        console.setLayout(new PatternLayout(PATTERN));
-        console.setThreshold(Level.FATAL);
-        console.activateOptions();
-        //add appender to any Logger (here is root)
-        Logger.getRootLogger().addAppender(console);
 
-        FileAppender fa = new FileAppender();
-        fa.setName("FileLogger");
-        fa.setFile("/tmp/mylog.log");
-        fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-        fa.setThreshold(Level.ERROR);
-        fa.setAppend(true);
-        fa.activateOptions();
-
-        //add appender to any Logger (here is root)
-        Logger.getRootLogger().addAppender(fa) ;
-        //repeat with all other desired appenders
-    }
     public File createSSTableFiles(String csvFile, String keyspace, String columnFamily, MutableInt lineCounter, MutableBoolean lastLineRead, BufferedReader reader) throws IOException {
-        initLog();
-//        System.out.print(System.getProperty("cassandra.config"));
-//        System.out.print(System.getProperty("dse.config"));
-//        System.exit(0);
-//        System.setProperty("cassandra.config","file:///home/ubuntu/projects/CassandraDataImport2/cassandra.yaml");
 
-//        System.setProperty("dse.config","file:///home/ubuntu/projects/CassandraDataImport2/dse.yaml");
         File directory = new File(keyspace+columnFamily);
         if (directory.exists()) {
             FileUtils.deleteDirectory(directory);
