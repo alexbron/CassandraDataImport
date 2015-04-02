@@ -25,6 +25,8 @@ import static org.apache.cassandra.utils.ByteBufferUtil.bytes;
 public class SSTableCreator {
 
     public static final int LINES_IN_BATCH = 1000000;
+    final int hourly_ttl = 3 * 60 * 60 * 24;
+    final int daily_ttl = 3 * 365* 60 * 60 * 24;
 
 
     public File createSSTableFiles(String csvFile, String keyspace, String columnFamily, MutableInt lineCounter, MutableBoolean lastLineRead, BufferedReader reader) throws IOException {
@@ -55,17 +57,21 @@ public class SSTableCreator {
         long timestamp = System.currentTimeMillis() * 1000;
 
         int currentCounter = 0;
+        int ttl = daily_ttl;
+        if(columnFamily.contains("hour"))
+            ttl = hourly_ttl;
+
 
         while ((line = reader.readLine()) != null && currentCounter < LINES_IN_BATCH) {
             currentCounter++;
             if (entry.parse(line, lineCounter.intValue()+currentCounter)) {
                 usersWriter.newRow(bytes(entry.partner_filter_gb1_gb2));
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb1")).build(), ByteBufferUtil.bytes(entry.dim_gb1), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb2")).build(),ByteBufferUtil.bytes(entry.dim_gb2), timestamp);
-                usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("f")).build(), ByteBufferUtil.bytes(entry.f), timestamp);
+                usersWriter.addExpiringColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb1")).build(), ByteBufferUtil.bytes(entry.dim_gb1), timestamp, ttl, (timestamp/1000) + ttl * 1000);
+                usersWriter.addExpiringColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("dim_gb2")).build(), ByteBufferUtil.bytes(entry.dim_gb2), timestamp, ttl, (timestamp/1000) + ttl * 1000);
+                usersWriter.addExpiringColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("f")).build(), ByteBufferUtil.bytes(entry.f), timestamp, ttl, (timestamp/1000) + ttl * 1000);
                 for(int i=1; i < CsvEntry.max_allowed_measures;i++)
                 {
-                    usersWriter.addColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m"+i)).build(), ByteBufferUtil.bytes(entry.getMeasures()[i]), timestamp);
+                    usersWriter.addExpiringColumn(cmpType.builder().add(ByteBufferUtil.bytes(entry.dt_gb1_gb2)).add(ByteBufferUtil.bytes("m" + i)).build(), ByteBufferUtil.bytes(entry.getMeasures()[i]), timestamp, ttl, (timestamp/1000) + ttl * 1000);
                 }
             }
 

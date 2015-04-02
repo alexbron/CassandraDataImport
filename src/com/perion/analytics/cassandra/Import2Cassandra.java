@@ -39,8 +39,8 @@ public class Import2Cassandra {
     }
     public static void main(String[] args) throws Exception {
         final String keyspace = "lightspeed";
-        final String columnFamily = "analytics_qa_active_users_daily";
-        final String csvFile = "/tmp/s3_file_funnel_daily.csv";
+        final String columnFamily = "analytics_stg_active_users_hourly";
+        final String csvFile = "/cassandra_tmp/s3_file_active_users_hourly_10.csv";
         final String remoteFolderRoot = "/tmp/Alex/";
         final String remoteHost = "172.26.3.84";
         final int jmxPort = 7199;
@@ -77,14 +77,14 @@ public class Import2Cassandra {
                         np = new JmxBulkLoader(remoteHost, jmxPort);
                     log.error("Bulk Loading start");
                     np.bulkLoad(remoteFolder);
-                    log.error("Bulk Loading enf");
+                    log.error("Bulk Loading end");
                 } finally {
                     copyTo.rmRemoteFiles();
                 }
             }
             log.error("End import");
         } catch (Exception e) {
-            System.out.print(e);
+            log.error("An exception was thrown in Import2Cassandra::importData:",e);
         } finally {
             if (copyTo != null)
                 copyTo.disconnect();
