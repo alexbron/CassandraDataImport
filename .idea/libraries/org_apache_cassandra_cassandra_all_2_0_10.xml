@@ -42,7 +42,6 @@
       <root url="jar://$PROJECT_DIR$/lib/cassandra-thrift-2.0.10.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jamm-0.2.5.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/netty-3.6.6.Final.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/dse.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/lib/cassandra-all-2.0.10-javadoc.jar!/" />
